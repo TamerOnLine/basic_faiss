@@ -2,6 +2,10 @@ pytest
 python-dotenv
 requests
 langchain-community
+langchain
+ollama
+pandas
 langchain-ollama
-langchain_ollama
+faiss-cpu
+
 
