@@ -1,0 +1,46 @@
+name: Test Virtual Environment Setup
+
+on: [push, pull_request]
+
+jobs:
+  test-venv:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Clear pip cache
+        shell: bash  # تأكد من أن الأوامر تعمل في بيئة Bash
+        run: pip cache purge
+
+      - name: Remove all installed packages
+        shell: bash
+        run: |
+          pip freeze > installed_packages.txt
+          if [ -s installed_packages.txt ]; then xargs pip uninstall -y < installed_packages.txt; fi
+
+      - name: Remove all installed packages (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh  # تشغيل أوامر PowerShell على Windows
+        run: |
+          pip freeze | Out-File installed_packages.txt
+          if ((Get-Content installed_packages.txt).Length -gt 0) {
+            Get-Content installed_packages.txt | ForEach-Object { pip uninstall -y $_ }
+          }
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install --no-cache-dir -r requirements.txt
+
+      - name: Run tests
+        run: pytest
