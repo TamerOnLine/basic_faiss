@@ -1,152 +1,203 @@
 import os
-import pandas as pd
 import logging
-from langchain.agents import AgentType, initialize_agent
+import requests
+from bs4 import BeautifulSoup
 from langchain_ollama import OllamaLLM, OllamaEmbeddings
 from langchain_community.vectorstores import FAISS
-from langchain.tools import Tool
+from langchain.agents import AgentType, initialize_agent
 from langchain.memory import ConversationBufferMemory
+from langchain.tools import Tool
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
-# Initialize the LLM model
+# Initialize Ollama LLM
 llm = OllamaLLM(model="llama3.2")
+
+# Initialize text-to-vector model
 embeddings = OllamaEmbeddings(model="locusai/multi-qa-minilm-l6-cos-v1")
 
-# Path to the FAISS database
+# FAISS database path
 FAISS_PATH = "faiss_chat_index"
 
-# Load or create FAISS database
 def initialize_faiss():
-    """Initialize or load the FAISS database."""
-    if os.path.exists(os.path.join(FAISS_PATH, "index.faiss")):
+    """
+    Load or create a FAISS database.
+
+    Returns:
+        FAISS: The FAISS index object.
+    """
+    faiss_file = os.path.join(FAISS_PATH, "index.faiss")
+    if os.path.exists(faiss_file):
         logging.info("Loading FAISS database...")
         return FAISS.load_local(FAISS_PATH, embeddings, allow_dangerous_deserialization=True)
     
-    logging.info("FAISS database not found. Creating a new one...")
-    faiss_index = FAISS.from_texts(["Welcome to the chatbot!"], embeddings)
+    logging.info("FAISS database not found, creating a new one...")
+    sample_texts = [
+        "Hello, how can I help you?", 
+        "Welcome to FAISS!", 
+        "This is a test entry."
+    ]
+
+    faiss_index = FAISS.from_texts(sample_texts, embeddings)
     faiss_index.save_local(FAISS_PATH)
-    logging.info("New FAISS database created and saved.")
+    logging.info("FAISS database created successfully.")
     return faiss_index
 
 faiss_index = initialize_faiss()
 
-
-def search_chat(query: str, k: int = 3, threshold: float = 0.7):
-    """Search the FAISS database and return the best-matching response."""
-    results = faiss_index.similarity_search_with_score(query, k)
+def classify_question(query: str) -> str:
+    """
+    Classify the question using Ollama before directing it to the appropriate tool.
     
-    for doc, score in results:
-        if "→ Bot: " in doc.page_content and score >= threshold:
-            stored_question, stored_answer = doc.page_content.split("→ Bot: ")
-            if query.lower().strip() in stored_question.lower().strip():
-                return stored_answer
-    return None
-
-
-def store_chat(query: str, response: str):
-    """Store a question-response pair in the FAISS database."""
-    global faiss_index
+    Args:
+        query (str): The user query.
     
-    if search_chat(query, k=1, threshold=0.9):
-        logging.warning("This question already exists in FAISS.")
-        return
+    Returns:
+        str: Either 'faiss_search' for database searches or 'ollama_ai' for AI-generated answers.
+    """
+    classification_prompt = (
+        "Classify the question into one of these categories:\n"
+        "1. Search FAISS database\n"
+        "2. Generate a new response with Ollama\n"
+        f"\nQuestion: {query}"
+    )
+    classification = llm.invoke(classification_prompt).strip().lower()
     
-    formatted_text = f"User: {query} → Bot: {response}"
-    faiss_index.add_texts([formatted_text])
-    faiss_index.save_local(FAISS_PATH)
+    return "faiss_search" if "faiss" in classification else "ollama_ai"
 
-
-def load_data_from_file(file_path: str):
-    """Load data from a CSV or TXT file into the FAISS database."""
-    global faiss_index
+def scrape_webpage(url: str) -> str:
+    """
+    Extract text content from a webpage.
     
-    if file_path.endswith(".csv"):
-        df = pd.read_csv(file_path)
-        texts = df.iloc[:, 0].tolist()
-    elif file_path.endswith(".txt"):
-        with open(file_path, "r", encoding="utf-8") as file:
-            texts = file.readlines()
-    else:
-        logging.error("Unsupported file format! Use CSV or TXT.")
-        return
+    Args:
+        url (str): The URL of the webpage to scrape.
     
-    logging.info(f"Loading {len(texts)} entries into FAISS...")
-    faiss_index.add_texts(texts)
-    faiss_index.save_local(FAISS_PATH)
-    logging.info("Data successfully added to FAISS.")
+    Returns:
+        str: Extracted text content, truncated to 5000 characters if necessary.
+    """
+    headers = {"User-Agent": "Mozilla/5.0"}
+    response = requests.get(url, headers=headers, timeout=5)
+    response.raise_for_status()
 
+    soup = BeautifulSoup(response.text, "html.parser")
+    paragraphs = soup.find_all("p")
+    text_content = "\n".join([p.get_text() for p in paragraphs if p.get_text()])
 
-def split_text_into_chunks(text, chunk_size=200, overlap=50):
-    """Split large texts into smaller chunks with overlap."""
-    return [text[i:i + chunk_size] for i in range(0, len(text), chunk_size - overlap)]
+    return text_content[:5000] + "..." if len(text_content) > 5000 else text_content
 
-
-def store_large_text(query: str, response: str, chunk_size=200, overlap=50):
-    """Store long responses in FAISS using sliding window chunks."""
-    global faiss_index  
-    
-    chunks = split_text_into_chunks(response, chunk_size, overlap)
-    chunked_texts = [f"User: {query} → Bot: {chunk}" for chunk in chunks]
-    
-    faiss_index.add_texts(chunked_texts)
-    faiss_index.save_local(FAISS_PATH)
-    logging.info(f"Stored {len(chunked_texts)} chunks in FAISS.")
-
-
-def search_with_sliding_window(query: str, k=5, threshold=0.65):
-    """Search FAISS with sliding window and return relevant results."""
-    global faiss_index
-    results = faiss_index.similarity_search_with_score(query, k)
-    
-    filtered_responses = [doc.page_content.split("→ Bot: ")[1] for doc, score in results if "→ Bot: " in doc.page_content and score >= threshold]
-    
-    return "\n---\n".join(filtered_responses[:3]) if filtered_responses else "No accurate results found."
-
-
-# Define the FAISS search tool
-search_tool = Tool(
-    name="FAISS Search",
-    func=search_chat,
-    description="Searches stored chat history in FAISS to find relevant responses."
+# Define web scraper tool
+web_scraper_tool = Tool(
+    name="WebScraper",
+    func=scrape_webpage,
+    description="Scrapes webpage content and extracts text data.",
+    return_direct=True,
 )
 
-llm_tool = Tool(
-    name="Ollama LLM",
-    func=lambda query: llm.invoke(query),
-    description="Uses Ollama LLM to answer queries when no response is found in FAISS."
-)
+def search_faiss(query: str, k: int = 5, threshold: float = 0.6) -> str:
+    """
+    Perform a similarity search in FAISS and return relevant results.
 
+    Args:
+        query (str): The search query.
+        k (int, optional): Number of results to retrieve. Defaults to 5.
+        threshold (float, optional): Minimum similarity score. Defaults to 0.6.
+
+    Returns:
+        str: A string of search results or a message if none are found.
+    """
+    results = faiss_index.similarity_search_with_score(query, k=k)
+    filtered_responses = [
+        doc.page_content.split("\u2192 Bot: ")[1]
+        for doc, score in results if "\u2192 Bot: " in doc.page_content and score >= threshold
+    ]
+    return "\n---\n".join(filtered_responses[:3]) if filtered_responses else "No relevant results found."
+
+def ollama_fallback(query: str) -> str:
+    """
+    Use Ollama to generate an answer if FAISS has no relevant responses.
+    
+    Args:
+        query (str): The user query.
+    
+    Returns:
+        str: The generated response or an error message.
+    """
+    try:
+        return llm.invoke(query) or "No answer found."
+    except Exception as e:
+        logging.error(f"Error querying Ollama: {e}")
+        return "An error occurred while retrieving an answer."
+
+def execute_tool(tool_name: str, query: str) -> str:
+    """
+    Execute the appropriate tool based on classification.
+
+    Args:
+        tool_name (str): The tool to use ('faiss_search' or 'ollama_ai').
+        query (str): The user query.
+
+    Returns:
+        str: The tool's response.
+    """
+    if tool_name == "faiss_search":
+        result = search_faiss(query)
+        return result if result != "No relevant results found." else ollama_fallback(query)
+    
+    elif tool_name == "ollama_ai":
+        return ollama_fallback(query)
+
+    return "Unknown tool, please check your input."
+
+# Define search tools
+search_tool = Tool(name="faiss_search", func=search_faiss, description="Search FAISS database for relevant answers.")
+ollama_tool = Tool(name="ollama_ai", func=ollama_fallback, description="Uses Ollama LLM for question answering.")
+
+# Initialize conversation memory
 memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
 
+# Initialize the agent
 agent = initialize_agent(
-    tools=[search_tool, llm_tool],
+    tools=[search_tool, ollama_tool, web_scraper_tool],
     llm=llm,
     agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
     verbose=True,
-    memory=memory
+    memory=memory,
+    max_iterations=10,
+    handle_parsing_errors=True
 )
 
-
-def chat_with_faiss():
-    """Run an interactive chat session using FAISS."""
-    logging.info("Starting FAISS-powered chatbot...")
-    print("Type 'exit' to leave the chat.")
+def process(query: str) -> str:
+    """
+    Run the agent to process queries.
     
-    while True:
-        query = input("You: ").strip()
-        if query.lower() == "exit":
-            break
-        
-        response = search_with_sliding_window(query)
-        if response == "No accurate results found.":
-            logging.info("Using Ollama LLM...")
-            response = llm.invoke(query)
-            store_large_text(query, response)
-        
-        print(f"Bot: {response}")
+    Args:
+        query (str): The user query.
+    
+    Returns:
+        str: The response generated by the agent.
+    """
+    logging.info(f"Processing query: {query}")
+    result = agent.invoke(query)
+    return result.get("output", "No response")
 
+def chat():
+    """
+    Start an interactive chat session using FAISS and Ollama.
+    """
+    logging.info("Starting chat session...")
+    print("Type 'exit' to end the conversation.")
+    while True:
+        try:
+            query = input("You: ").strip()
+            if query.lower() == "exit":
+                break
+            category = classify_question(query)
+            response = execute_tool(category, query)
+            print(f"Bot: {response}")
+        except Exception as e:
+            logging.error(f"Chat error: {e}")
+            print("An error occurred, please try again.")
 
 if __name__ == "__main__":
-    chat_with_faiss()
+    chat()

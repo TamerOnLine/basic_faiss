@@ -1,0 +1,187 @@
+Windows PowerShell
+Copyright (C) Microsoft Corporation. Alle Rechte vorbehalten.
+
+Installieren Sie die neueste PowerShell für neue Funktionen und Verbesserungen! https://aka.ms/PSWindows
+
+PS C:\WINDOWS\system32> ollama serve
+2025/03/09 00:11:42 routes.go:1215: INFO server config env="map[CUDA_VISIBLE_DEVICES: GPU_DEVICE_ORDINAL: HIP_VISIBLE_DEVICES: HSA_OVERRIDE_GFX_VERSION: HTTPS_PROXY: HTTP_PROXY: NO_PROXY: OLLAMA_CONTEXT_LENGTH:2048 OLLAMA_DEBUG:false OLLAMA_FLASH_ATTENTION:false OLLAMA_GPU_OVERHEAD:0 OLLAMA_HOST:http://127.0.0.1:11434 OLLAMA_INTEL_GPU:false OLLAMA_KEEP_ALIVE:5m0s OLLAMA_KV_CACHE_TYPE: OLLAMA_LLM_LIBRARY: OLLAMA_LOAD_TIMEOUT:5m0s OLLAMA_MAX_LOADED_MODELS:0 OLLAMA_MAX_QUEUE:512 OLLAMA_MODELS:T:\\Ollama\\models OLLAMA_MULTIUSER_CACHE:false OLLAMA_NEW_ENGINE:false OLLAMA_NOHISTORY:false OLLAMA_NOPRUNE:false OLLAMA_NUM_PARALLEL:0 OLLAMA_ORIGINS:[http://localhost https://localhost http://localhost:* https://localhost:* http://127.0.0.1 https://127.0.0.1 http://127.0.0.1:* https://127.0.0.1:* http://0.0.0.0 https://0.0.0.0 http://0.0.0.0:* https://0.0.0.0:* app://* file://* tauri://* vscode-webview://* vscode-file://*] OLLAMA_SCHED_SPREAD:false ROCR_VISIBLE_DEVICES:]"
+time=2025-03-09T00:11:42.654+01:00 level=INFO source=images.go:432 msg="total blobs: 17"
+time=2025-03-09T00:11:42.655+01:00 level=INFO source=images.go:439 msg="total unused blobs removed: 0"
+time=2025-03-09T00:11:42.666+01:00 level=INFO source=routes.go:1277 msg="Listening on 127.0.0.1:11434 (version 0.5.13)"
+time=2025-03-09T00:11:42.666+01:00 level=INFO source=gpu.go:217 msg="looking for compatible GPUs"
+time=2025-03-09T00:11:42.666+01:00 level=INFO source=gpu_windows.go:167 msg=packages count=1
+time=2025-03-09T00:11:42.666+01:00 level=INFO source=gpu_windows.go:214 msg="" package=0 cores=6 efficiency=0 threads=6
+time=2025-03-09T00:11:42.839+01:00 level=INFO source=types.go:130 msg="inference compute" id=GPU-e3c2e89b-5d91-e331-c86b-d2215cc65694 library=cuda variant=v12 compute=6.1 driver=12.8 name="NVIDIA GeForce GTX 1080" total="8.0 GiB" available="7.0 GiB"
+time=2025-03-09T00:12:33.841+01:00 level=WARN source=types.go:514 msg="invalid option provided" option=tfs_z
+time=2025-03-09T00:12:33.866+01:00 level=WARN source=ggml.go:136 msg="key not found" key=bert.attention.head_count_kv default=1
+time=2025-03-09T00:12:33.866+01:00 level=WARN source=ggml.go:136 msg="key not found" key=bert.attention.key_length default=32
+time=2025-03-09T00:12:33.867+01:00 level=WARN source=ggml.go:136 msg="key not found" key=bert.attention.value_length default=32
+time=2025-03-09T00:12:33.867+01:00 level=WARN source=ggml.go:136 msg="key not found" key=bert.attention.head_count_kv default=1
+time=2025-03-09T00:12:33.867+01:00 level=INFO source=sched.go:715 msg="new model will fit in available VRAM in single GPU, loading" model=T:\Ollama\models\blobs\sha256-a438147dd8e97a2a34ecaa1a7c836c1305174a3eb7b2f39aec8277a983572e64 gpu=GPU-e3c2e89b-5d91-e331-c86b-d2215cc65694 parallel=1 available=7592587264 required="553.8 MiB"
+time=2025-03-09T00:12:33.892+01:00 level=INFO source=server.go:97 msg="system memory" total="15.9 GiB" free="9.3 GiB" free_swap="21.2 GiB"
+time=2025-03-09T00:12:33.893+01:00 level=WARN source=ggml.go:136 msg="key not found" key=bert.attention.head_count_kv default=1
+time=2025-03-09T00:12:33.893+01:00 level=WARN source=ggml.go:136 msg="key not found" key=bert.attention.key_length default=32
+time=2025-03-09T00:12:33.894+01:00 level=WARN source=ggml.go:136 msg="key not found" key=bert.attention.value_length default=32
+time=2025-03-09T00:12:33.894+01:00 level=WARN source=ggml.go:136 msg="key not found" key=bert.attention.head_count_kv default=1
+time=2025-03-09T00:12:33.895+01:00 level=INFO source=server.go:130 msg=offload library=cuda layers.requested=-1 layers.model=7 layers.offload=7 layers.split="" memory.available="[7.1 GiB]" memory.gpu_overhead="0 B" memory.required.full="553.8 MiB" memory.required.partial="553.8 MiB" memory.required.kv="1.5 MiB" memory.required.allocations="[553.8 MiB]" memory.weights.total="42.1 MiB" memory.weights.repeating="17179869184.0 GiB" memory.weights.nonrepeating="44.7 MiB" memory.graph.full="3.0 MiB" memory.graph.partial="3.0 MiB"
+time=2025-03-09T00:12:33.928+01:00 level=INFO source=server.go:380 msg="starting llama server" cmd="C:\\Users\\Tamer\\AppData\\Local\\Programs\\Ollama\\ollama.exe runner --model T:\\Ollama\\models\\blobs\\sha256-a438147dd8e97a2a34ecaa1a7c836c1305174a3eb7b2f39aec8277a983572e64 --ctx-size 2048 --batch-size 512 --n-gpu-layers 7 --threads 6 --no-mmap --parallel 1 --port 53468"
+time=2025-03-09T00:12:33.944+01:00 level=INFO source=sched.go:450 msg="loaded runners" count=1
+time=2025-03-09T00:12:33.948+01:00 level=INFO source=server.go:557 msg="waiting for llama runner to start responding"
+time=2025-03-09T00:12:33.951+01:00 level=INFO source=server.go:591 msg="waiting for server to become available" status="llm server error"
+time=2025-03-09T00:12:34.051+01:00 level=INFO source=runner.go:931 msg="starting go runner"
+ggml_cuda_init: GGML_CUDA_FORCE_MMQ:    no
+ggml_cuda_init: GGML_CUDA_FORCE_CUBLAS: no
+ggml_cuda_init: found 1 CUDA devices:
+  Device 0: NVIDIA GeForce GTX 1080, compute capability 6.1, VMM: yes
+load_backend: loaded CUDA backend from C:\Users\Tamer\AppData\Local\Programs\Ollama\lib\ollama\cuda_v12\ggml-cuda.dll
+load_backend: loaded CPU backend from C:\Users\Tamer\AppData\Local\Programs\Ollama\lib\ollama\ggml-cpu-haswell.dll
+time=2025-03-09T00:12:34.219+01:00 level=INFO source=runner.go:934 msg=system info="CPU : LLAMAFILE = 1 | CUDA : ARCHS = 500,600,610,700,750,800,860,870,890,900,1200 | USE_GRAPHS = 1 | PEER_MAX_BATCH_SIZE = 128 | CPU : SSE3 = 1 | SSSE3 = 1 | AVX = 1 | AVX2 = 1 | F16C = 1 | FMA = 1 | LLAMAFILE = 1 | cgo(clang)" threads=6
+time=2025-03-09T00:12:34.220+01:00 level=INFO source=runner.go:992 msg="Server listening on 127.0.0.1:53468"
+llama_model_load_from_file_impl: using device CUDA0 (NVIDIA GeForce GTX 1080) - 7187 MiB free
+llama_model_loader: loaded meta data with 22 key-value pairs and 101 tensors from T:\Ollama\models\blobs\sha256-a438147dd8e97a2a34ecaa1a7c836c1305174a3eb7b2f39aec8277a983572e64 (version GGUF V3 (latest))
+llama_model_loader: Dumping metadata keys/values. Note: KV overrides do not apply in this output.
+llama_model_loader: - kv   0:                       general.architecture str              = bert
+llama_model_loader: - kv   1:                               general.name str              = multi-qa-MiniLM-L6-cos-v1
+llama_model_loader: - kv   2:                           bert.block_count u32              = 6
+llama_model_loader: - kv   3:                        bert.context_length u32              = 512
+llama_model_loader: - kv   4:                      bert.embedding_length u32              = 384
+llama_model_loader: - kv   5:                   bert.feed_forward_length u32              = 1536
+llama_model_loader: - kv   6:                  bert.attention.head_count u32              = 12
+llama_model_loader: - kv   7:          bert.attention.layer_norm_epsilon f32              = 0.000000
+llama_model_loader: - kv   8:                          general.file_type u32              = 0
+llama_model_loader: - kv   9:                      bert.attention.causal bool             = false
+llama_model_loader: - kv  10:                          bert.pooling_type u32              = 1
+llama_model_loader: - kv  11:            tokenizer.ggml.token_type_count u32              = 2
+llama_model_loader: - kv  12:                       tokenizer.ggml.model str              = bert
+llama_model_loader: - kv  13:                         tokenizer.ggml.pre str              = jina-v2-en
+llama_model_loader: - kv  14:                      tokenizer.ggml.tokens arr[str,30522]   = ["[PAD]", "[unused0]", "[unused1]", "...
+llama_model_loader: - kv  15:                  tokenizer.ggml.token_type arr[i32,30522]   = [3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...
+llama_model_loader: - kv  16:            tokenizer.ggml.unknown_token_id u32              = 100
+llama_model_loader: - kv  17:          tokenizer.ggml.seperator_token_id u32              = 102
+llama_model_loader: - kv  18:            tokenizer.ggml.padding_token_id u32              = 0
+llama_model_loader: - kv  19:                tokenizer.ggml.cls_token_id u32              = 101
+llama_model_loader: - kv  20:               tokenizer.ggml.mask_token_id u32              = 103
+llama_model_loader: - kv  21:               general.quantization_version u32              = 2
+llama_model_loader: - type  f32:  101 tensors
+print_info: file format = GGUF V3 (latest)
+print_info: file type   = all F32
+print_info: file size   = 86.08 MiB (32.00 BPW)
+load: special tokens cache size = 5
+load: token to piece cache size = 0.2032 MB
+print_info: arch             = bert
+print_info: vocab_only       = 0
+print_info: n_ctx_train      = 512
+print_info: n_embd           = 384
+print_info: n_layer          = 6
+print_info: n_head           = 12
+print_info: n_head_kv        = 12
+print_info: n_rot            = 32
+print_info: n_swa            = 0
+print_info: n_embd_head_k    = 32
+print_info: n_embd_head_v    = 32
+print_info: n_gqa            = 1
+print_info: n_embd_k_gqa     = 384
+print_info: n_embd_v_gqa     = 384
+print_info: f_norm_eps       = 1.0e-12
+print_info: f_norm_rms_eps   = 0.0e+00
+print_info: f_clamp_kqv      = 0.0e+00
+print_info: f_max_alibi_bias = 0.0e+00
+print_info: f_logit_scale    = 0.0e+00
+print_info: n_ff             = 1536
+print_info: n_expert         = 0
+print_info: n_expert_used    = 0
+print_info: causal attn      = 0
+print_info: pooling type     = 1
+print_info: rope type        = 2
+print_info: rope scaling     = linear
+print_info: freq_base_train  = 10000.0
+print_info: freq_scale_train = 1
+print_info: n_ctx_orig_yarn  = 512
+print_info: rope_finetuned   = unknown
+print_info: ssm_d_conv       = 0
+print_info: ssm_d_inner      = 0
+print_info: ssm_d_state      = 0
+print_info: ssm_dt_rank      = 0
+print_info: ssm_dt_b_c_rms   = 0
+print_info: model type       = 22M
+print_info: model params     = 22.57 M
+print_info: general.name     = multi-qa-MiniLM-L6-cos-v1
+print_info: vocab type       = WPM
+print_info: n_vocab          = 30522
+print_info: n_merges         = 0
+print_info: BOS token        = 101 '[CLS]'
+print_info: UNK token        = 100 '[UNK]'
+print_info: SEP token        = 102 '[SEP]'
+print_info: PAD token        = 0 '[PAD]'
+print_info: MASK token       = 103 '[MASK]'
+print_info: LF token         = 0 '[PAD]'
+print_info: max token length = 21
+load_tensors: loading model tensors, this can take a while... (mmap = false)
+load_tensors: offloading 6 repeating layers to GPU
+load_tensors: offloading output layer to GPU
+load_tensors: offloaded 7/7 layers to GPU
+load_tensors:    CUDA_Host model buffer size =    45.47 MiB
+load_tensors:        CUDA0 model buffer size =    40.61 MiB
+llama_init_from_model: n_seq_max     = 1
+llama_init_from_model: n_ctx         = 2048
+llama_init_from_model: n_ctx_per_seq = 2048
+llama_init_from_model: n_batch       = 512
+llama_init_from_model: n_ubatch      = 512
+llama_init_from_model: flash_attn    = 0
+llama_init_from_model: freq_base     = 10000.0
+llama_init_from_model: freq_scale    = 1
+llama_init_from_model: n_ctx_pre_seq (2048) > n_ctx_train (512) -- possible training context overflow
+llama_kv_cache_init: kv_size = 2048, offload = 1, type_k = 'f16', type_v = 'f16', n_layer = 6, can_shift = 1
+llama_kv_cache_init:      CUDA0 KV buffer size =    18.00 MiB
+llama_init_from_model: KV self size  =   18.00 MiB, K (f16):    9.00 MiB, V (f16):    9.00 MiB
+llama_init_from_model:  CUDA_Host  output buffer size =     0.00 MiB
+llama_init_from_model:      CUDA0 compute buffer size =    17.00 MiB
+llama_init_from_model:  CUDA_Host compute buffer size =     3.50 MiB
+llama_init_from_model: graph nodes  = 221
+llama_init_from_model: graph splits = 4 (with bs=512), 2 (with bs=1)
+time=2025-03-09T00:12:34.455+01:00 level=INFO source=server.go:596 msg="llama runner started in 0.51 seconds"
+llama_model_loader: loaded meta data with 22 key-value pairs and 101 tensors from T:\Ollama\models\blobs\sha256-a438147dd8e97a2a34ecaa1a7c836c1305174a3eb7b2f39aec8277a983572e64 (version GGUF V3 (latest))
+llama_model_loader: Dumping metadata keys/values. Note: KV overrides do not apply in this output.
+llama_model_loader: - kv   0:                       general.architecture str              = bert
+llama_model_loader: - kv   1:                               general.name str              = multi-qa-MiniLM-L6-cos-v1
+llama_model_loader: - kv   2:                           bert.block_count u32              = 6
+llama_model_loader: - kv   3:                        bert.context_length u32              = 512
+llama_model_loader: - kv   4:                      bert.embedding_length u32              = 384
+llama_model_loader: - kv   5:                   bert.feed_forward_length u32              = 1536
+llama_model_loader: - kv   6:                  bert.attention.head_count u32              = 12
+llama_model_loader: - kv   7:          bert.attention.layer_norm_epsilon f32              = 0.000000
+llama_model_loader: - kv   8:                          general.file_type u32              = 0
+llama_model_loader: - kv   9:                      bert.attention.causal bool             = false
+llama_model_loader: - kv  10:                          bert.pooling_type u32              = 1
+llama_model_loader: - kv  11:            tokenizer.ggml.token_type_count u32              = 2
+llama_model_loader: - kv  12:                       tokenizer.ggml.model str              = bert
+llama_model_loader: - kv  13:                         tokenizer.ggml.pre str              = jina-v2-en
+llama_model_loader: - kv  14:                      tokenizer.ggml.tokens arr[str,30522]   = ["[PAD]", "[unused0]", "[unused1]", "...
+llama_model_loader: - kv  15:                  tokenizer.ggml.token_type arr[i32,30522]   = [3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...
+llama_model_loader: - kv  16:            tokenizer.ggml.unknown_token_id u32              = 100
+llama_model_loader: - kv  17:          tokenizer.ggml.seperator_token_id u32              = 102
+llama_model_loader: - kv  18:            tokenizer.ggml.padding_token_id u32              = 0
+llama_model_loader: - kv  19:                tokenizer.ggml.cls_token_id u32              = 101
+llama_model_loader: - kv  20:               tokenizer.ggml.mask_token_id u32              = 103
+llama_model_loader: - kv  21:               general.quantization_version u32              = 2
+llama_model_loader: - type  f32:  101 tensors
+print_info: file format = GGUF V3 (latest)
+print_info: file type   = all F32
+print_info: file size   = 86.08 MiB (32.00 BPW)
+load: special tokens cache size = 5
+load: token to piece cache size = 0.2032 MB
+print_info: arch             = bert
+print_info: vocab_only       = 1
+print_info: model type       = ?B
+print_info: model params     = 22.57 M
+print_info: general.name     = multi-qa-MiniLM-L6-cos-v1
+print_info: vocab type       = WPM
+print_info: n_vocab          = 30522
+print_info: n_merges         = 0
+print_info: BOS token        = 101 '[CLS]'
+print_info: UNK token        = 100 '[UNK]'
+print_info: SEP token        = 102 '[SEP]'
+print_info: PAD token        = 0 '[PAD]'
+print_info: MASK token       = 103 '[MASK]'
+print_info: LF token         = 0 '[PAD]'
+print_info: max token length =

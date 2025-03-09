@@ -7,5 +7,7 @@ ollama
 pandas
 langchain-ollama
 faiss-cpu
+pymupdf
+beautifulsoup4
 
 
